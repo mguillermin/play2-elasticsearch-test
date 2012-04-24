@@ -1,0 +1,24 @@
+@(generateForm: Form[Indexing.Generate])(errors: List[String] = Nil)(implicit flash: Flash)
+
+@import helper._
+@import helper.twitterBootstrap._
+
+@main("Generate"){
+  <h2>Generate Data</h2>
+  @flash.get("success").map { message =>
+    <p class="alert alert-success">@message</p>
+  }
+
+  @errors.map { message =>
+    <p class="alert alert-error">@message</p>
+  }
+
+  @form(action = routes.Indexing.generateData) {
+    @inputText(generateForm("nb"))
+
+    <p class="buttons">
+        <input type="submit" id="submit">
+    <p>
+
+  }
+}

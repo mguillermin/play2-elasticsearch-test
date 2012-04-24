@@ -6,6 +6,7 @@ import org.elasticsearch.client.Client;
 import org.elasticsearch.node.Node;
 import org.elasticsearch.node.NodeBuilder;
 import play.Logger;
+import play.Play;
 
 import java.io.IOException;
 
@@ -36,13 +37,11 @@ public class IndexUtils {
   }
 
   public static void initClient(boolean embedded) {
-    initClient(embedded, false);
-  }
-
-  public static void initClient(boolean embedded, boolean force) {
-    if (instance == null || force) {
+    if (instance == null) {
       Logger.info(String.format("Elastic search client initialisation. [embedded] : %s", embedded));
-      Node node = NodeBuilder.nodeBuilder().client(!embedded).node();
+      NodeBuilder nodeBuilder = NodeBuilder.nodeBuilder();
+      nodeBuilder.clusterName(Play.application().configuration().getString("es.clustername"));
+      Node node = nodeBuilder.client(!embedded).node();
       Client client = node.client();
       instance = new IndexUtils(node, client);
       Logger.info("Elastic search client initialisation done.");
@@ -50,12 +49,13 @@ public class IndexUtils {
   }
 
   public static void initClient() {
-    initClient(false);
+    initClient(Play.application().configuration().getBoolean("es.embedded"));
   }
 
   public static void closeClient() {
     if (instance != null) {
       instance.close();
+      instance = null;
     }
   }
   
